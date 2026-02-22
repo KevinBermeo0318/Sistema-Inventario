@@ -5,146 +5,256 @@
 ![SQLite](https://img.shields.io/badge/Database-SQLite-lightgrey)
 ![Status](https://img.shields.io/badge/Status-Completed-success)
 
-Sistema de Inventario desarrollado en **Java** con arquitectura por capas y conexión a **SQLite**, diseñado para gestionar productos, usuarios y movimientos de inventario de forma eficiente.
+Sistema de Inventario desarrollado en **Java** utilizando arquitectura en capas (DAO + Model + UI) y base de datos **SQLite** para la persistencia de datos.
 
-🔗 **Repositorio:**  
+🔗 Repositorio:  
 https://github.com/KevinBermeo0318/Sistema-Inventario
 
 ---
 
-## 📌 Descripción
+# 📌 Descripción General
 
-Este proyecto implementa una aplicación de escritorio utilizando **Java Swing** que permite:
+La aplicación permite administrar productos y usuarios, así como registrar movimientos de inventario (entradas y salidas).
 
-- Gestionar productos
-- Administrar usuarios
-- Registrar entradas y salidas de inventario
-- Persistir datos mediante SQLite
-- Aplicar el patrón DAO para separación de responsabilidades
+Está diseñada como una aplicación de escritorio utilizando **Java Swing**, aplicando buenas prácticas como:
 
-Está estructurado siguiendo buenas prácticas de organización y modularidad.
-
----
-
-## 🚀 Funcionalidades
-
-✔️ Autenticación de usuarios  
-✔️ CRUD de productos  
-✔️ CRUD de usuarios  
-✔️ Registro de movimientos (entradas y salidas)  
-✔️ Base de datos local automática  
-✔️ Interfaz gráfica intuitiva  
-✔️ Arquitectura en capas  
+- Separación de responsabilidades
+- Patrón DAO
+- Persistencia con SQLite
+- Organización modular del código
 
 ---
 
-## 🛠️ Tecnologías utilizadas
+# 🧠 Flujo del Sistema
 
-- **Java 17**
-- **Maven**
-- **Java Swing**
-- **SQLite**
-- **JDBC**
-- Patrón **DAO**
+1. El usuario inicia sesión.
+2. Se valida contra la base de datos.
+3. Se accede al panel principal.
+4. Desde el menú principal se puede:
+   - Gestionar productos
+   - Gestionar usuarios
+   - Registrar movimientos
+5. Cada acción se comunica con la base de datos a través de los DAO.
 
 ---
 
-## 🏗️ Arquitectura del proyecto
-
-El proyecto está organizado en capas:
+# 🏗️ Arquitectura del Proyecto
 
 ```
 com.inventario
 │
-├── dao        → Acceso a datos (DAO)
-├── db         → Gestión de conexión a base de datos
-├── model      → Entidades del sistema
-├── ui         → Interfaz gráfica (Swing)
+├── dao        → Lógica de acceso a datos
+├── db         → Conexión a SQLite
+├── model      → Clases que representan entidades
+├── ui         → Interfaz gráfica
 └── Main.java  → Punto de entrada
 ```
 
-Este diseño permite:
+---
 
-- Separación de responsabilidades
-- Mejor mantenimiento
-- Escalabilidad futura
-- Código más limpio y estructurado
+# 📂 Detalle del Código por Módulo
 
 ---
 
-## ⚙️ Instalación
+## 🔹 1. model (Entidades del sistema)
 
-### 1️⃣ Clonar el repositorio
+Contiene las clases que representan las tablas de la base de datos.
 
-```bash
-git clone https://github.com/KevinBermeo0318/Sistema-Inventario.git
-```
+### 📦 Producto.java
+Representa un producto del inventario.
 
-### 2️⃣ Acceder al directorio
+Atributos principales:
+- id
+- nombre
+- descripcion
+- cantidad
+- precio
 
-```bash
-cd Sistema-Inventario
-```
-
-### 3️⃣ Compilar el proyecto
-
-```bash
-mvn clean install
-```
-
-### 4️⃣ Ejecutar la aplicación
-
-```bash
-mvn exec:java
-```
-
-También puedes ejecutar `Main.java` directamente desde tu IDE.
+Responsabilidad:
+- Actuar como contenedor de datos.
+- Ser utilizado por DAO y UI para manipular información.
 
 ---
 
-## 🗄️ Base de datos
+### 👤 Usuario.java
+Representa un usuario del sistema.
 
-El sistema utiliza una base de datos local SQLite:
+Atributos:
+- id
+- username
+- password
+- rol (si está implementado)
+
+Responsabilidad:
+- Gestionar autenticación.
+- Representar los usuarios almacenados en la base de datos.
+
+---
+
+## 🔹 2. dao (Data Access Object)
+
+Encargado de interactuar con la base de datos.
+
+Aquí se encuentra la lógica SQL del sistema.
+
+---
+
+### 📦 ProductoDAO.java
+
+Funciones principales:
+
+- insertarProducto()
+- actualizarProducto()
+- eliminarProducto()
+- obtenerProductos()
+
+Responsabilidad:
+- Ejecutar consultas SQL.
+- Convertir resultados en objetos Producto.
+- Separar la lógica de base de datos del resto del sistema.
+
+---
+
+### 👤 UsuarioDAO.java
+
+Funciones principales:
+
+- insertarUsuario()
+- validarUsuario()
+- obtenerUsuarios()
+- eliminarUsuario()
+
+Responsabilidad:
+- Gestionar autenticación.
+- Controlar la persistencia de usuarios.
+
+---
+
+## 🔹 3. db (Conexión a base de datos)
+
+### 🗄️ DatabaseManager.java
+
+Responsabilidad:
+- Crear la conexión con SQLite.
+- Inicializar la base de datos si no existe.
+- Centralizar la configuración de conexión.
+
+Se utiliza JDBC para conectar con:
 
 ```
 inventario.db
 ```
 
-Se genera automáticamente si no existe.
+---
+
+## 🔹 4. ui (Interfaz Gráfica)
+
+Desarrollada con Java Swing.
 
 ---
 
-## 📈 Posibles mejoras futuras
+### 🔐 LoginFrame.java
 
-- Implementación de roles (admin / empleado)
-- Exportación de reportes en PDF o Excel
-- Migración a arquitectura web (Spring Boot)
-- Implementación de pruebas unitarias
-- Dashboard con estadísticas
+Función:
+- Mostrar formulario de inicio de sesión.
+- Validar credenciales usando UsuarioDAO.
+- Redirigir al panel principal si son correctas.
 
 ---
 
-## 🎯 Objetivo del proyecto
+### 🖥️ MainFrame.java
 
-Proyecto desarrollado con fines académicos y de práctica para reforzar:
+Función:
+- Ventana principal del sistema.
+- Permite navegar hacia:
+  - Gestión de productos
+  - Gestión de usuarios
+  - Movimientos
 
-- Programación orientada a objetos
-- Arquitectura por capas
-- Manejo de bases de datos
+---
+
+### 📦 UsuariosFrame.java
+
+Permite:
+- Ver lista de usuarios.
+- Agregar nuevos usuarios.
+- Eliminar usuarios.
+
+---
+
+### 📦 MovimientosFrame.java
+
+Permite:
+- Registrar entradas de inventario.
+- Registrar salidas.
+- Actualizar automáticamente la cantidad disponible.
+
+---
+
+### 📦 ProductoDialog.java / UsuarioDialog.java
+
+Ventanas emergentes para:
+- Crear
+- Editar
+- Confirmar información
+
+---
+
+# 🗄️ Base de Datos
+
+Base de datos local SQLite:
+
+```
+inventario.db
+```
+
+Tablas principales:
+
+- usuarios
+- productos
+- movimientos (si está implementado)
+
+La base de datos se crea automáticamente al ejecutar el sistema.
+
+---
+
+# 🛠️ Tecnologías Utilizadas
+
+- Java 17
+- Maven
+- Java Swing
+- SQLite
+- JDBC
+- Patrón DAO
+
+---
+
+# 📈 Posibles Mejoras
+
+- Implementar encriptación de contraseñas
+- Implementar roles y permisos
+- Añadir reportes en PDF
+- Migrar a versión web (Spring Boot)
+- Implementar pruebas unitarias (JUnit)
+
+---
+
+# 🎯 Objetivo Académico
+
+Este proyecto demuestra conocimientos en:
+
+- Programación Orientada a Objetos
+- Arquitectura en capas
+- Gestión de bases de datos
 - Desarrollo de aplicaciones de escritorio
-- Buenas prácticas con Maven
+- Organización profesional de proyectos
 
 ---
 
-## 👨‍💻 Autor
+# 👨‍💻 Autor
 
-**Kevin Rico Bermeo**  
+Kevin Rico Bermeo  
 Desarrollador en formación  
 
-🔗 GitHub: https://github.com/KevinBermeo0318
-
----
-
-## 📄 Licencia
-
-Este proyecto es de uso académico y demostrativo.
+GitHub:  
+https://github.com/KevinBermeo0318
