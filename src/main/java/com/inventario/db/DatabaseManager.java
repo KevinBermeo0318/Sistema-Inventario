@@ -65,7 +65,9 @@ public class DatabaseManager {
                     categoria TEXT,
                     cantidad INTEGER NOT NULL DEFAULT 0,
                     precio REAL NOT NULL DEFAULT 0.0,
-                    stock_minimo INTEGER NOT NULL DEFAULT 5
+                    stock_minimo INTEGER NOT NULL DEFAULT 5,
+                    fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
             """);
 
@@ -74,17 +76,32 @@ public class DatabaseManager {
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     producto_id INTEGER NOT NULL,
                     usuario_id INTEGER NOT NULL,
-                    tipo TEXT NOT NULL CHECK(tipo IN ('ENTRADA','SALIDA','AJUSTE')),
-                    cantidad INTEGER NOT NULL,
+                    tipo TEXT NOT NULL CHECK(tipo IN ('ENTRADA','SALIDA','AJUSTE','CREACION','MODIFICACION','ELIMINACION')),
+                    cantidad INTEGER NOT NULL DEFAULT 0,
                     fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
                     observacion TEXT,
                     FOREIGN KEY(producto_id) REFERENCES productos(id),
                     FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
                 )
             """);
+
+            migrarColumnasProductos(stmt);
+
         } catch (SQLException e) {
             throw new RuntimeException("Error al inicializar tablas: " + e.getMessage(), e);
         }
+    }
+
+    private void migrarColumnasProductos(Statement stmt) {
+        try {
+            stmt.execute("ALTER TABLE productos ADD COLUMN fecha_creacion DATETIME DEFAULT CURRENT_TIMESTAMP");
+        } catch (SQLException ignored) {}
+        try {
+            stmt.execute("ALTER TABLE productos ADD COLUMN fecha_actualizacion DATETIME DEFAULT CURRENT_TIMESTAMP");
+        } catch (SQLException ignored) {}
+        try {
+            stmt.execute("ALTER TABLE movimientos ADD COLUMN tipo TEXT NOT NULL DEFAULT 'AJUSTE'");
+        } catch (SQLException ignored) {}
     }
 
     private void insertarDatosIniciales() {

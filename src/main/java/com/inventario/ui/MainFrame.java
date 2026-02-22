@@ -3,12 +3,14 @@ package com.inventario.ui;
 import com.inventario.dao.ProductoDAO;
 import com.inventario.model.Producto;
 import com.inventario.model.Usuario;
+import com.inventario.report.ReporteInventarioPDF;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
+import java.io.File;
 import java.util.List;
 
 public class MainFrame extends JFrame {
@@ -63,6 +65,8 @@ public class MainFrame extends JFrame {
         btnCerrar.setFocusPainted(false);
         btnCerrar.setBackground(new Color(180, 50, 50));
         btnCerrar.setForeground(Color.WHITE);
+        btnCerrar.setOpaque(true);
+        btnCerrar.setBorderPainted(false);
         btnCerrar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnCerrar.addActionListener(e -> {
             dispose();
@@ -191,6 +195,10 @@ public class MainFrame extends JFrame {
         btnActualizar.addActionListener(e -> cargarProductos(txtBuscar.getText().trim()));
         panelIzq.add(btnActualizar);
 
+        JButton btnReporte = crearBoton("Generar Reporte PDF", new Color(100, 60, 140));
+        btnReporte.addActionListener(e -> generarReportePDF());
+        panelIzq.add(btnReporte);
+
         panel.add(panelIzq, BorderLayout.WEST);
 
         if (usuarioActual.esAdmin()) {
@@ -213,6 +221,8 @@ public class MainFrame extends JFrame {
         btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btn.setBackground(color);
         btn.setForeground(Color.WHITE);
+        btn.setOpaque(true);
+        btn.setBorderPainted(false);
         btn.setFocusPainted(false);
         btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return btn;
@@ -274,6 +284,8 @@ public class MainFrame extends JFrame {
             "Esta seguro de eliminar el producto: " + p.getNombre() + "?",
             "Confirmar eliminacion", JOptionPane.YES_NO_OPTION);
         if (res == JOptionPane.YES_OPTION) {
+            productoDAO.registrarMovimiento(p.getId(), usuarioActual.getId(), "ELIMINACION", p.getCantidad(),
+                "Producto eliminado por " + usuarioActual.getNombre() + " | Codigo: " + p.getCodigo());
             productoDAO.eliminar(p.getId());
             cargarProductos(null);
         }
@@ -331,6 +343,32 @@ public class MainFrame extends JFrame {
                 setText(String.format("$%.2f", (Double) value));
             }
             return c;
+        }
+    }
+
+    private void generarReportePDF() {
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Seleccionar carpeta para guardar el reporte");
+        chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+        chooser.setSelectedFile(new File(System.getProperty("user.home") + "\\Desktop"));
+
+        int res = chooser.showSaveDialog(this);
+        if (res != JFileChooser.APPROVE_OPTION) return;
+
+        String carpeta = chooser.getSelectedFile().getAbsolutePath();
+
+        try {
+            String archivo = new ReporteInventarioPDF().generar(carpeta);
+            int abrir = JOptionPane.showConfirmDialog(this,
+                "Reporte generado exitosamente:\n" + archivo + "\n\n¿Desea abrir el archivo?",
+                "Reporte PDF", JOptionPane.YES_NO_OPTION, JOptionPane.INFORMATION_MESSAGE);
+            if (abrir == JOptionPane.YES_OPTION) {
+                Desktop.getDesktop().open(new File(archivo));
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this,
+                "Error al generar el reporte:\n" + ex.getMessage(),
+                "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }

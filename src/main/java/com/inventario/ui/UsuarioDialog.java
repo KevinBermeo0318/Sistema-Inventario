@@ -66,13 +66,23 @@ public class UsuarioDialog extends JDialog {
 
         JPanel panelBotones = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
         JButton btnGuardar = new JButton("Guardar");
+        btnGuardar.setFont(new Font("Segoe UI", Font.BOLD, 13));
         btnGuardar.setBackground(new Color(40, 140, 80));
         btnGuardar.setForeground(Color.WHITE);
+        btnGuardar.setOpaque(true);
+        btnGuardar.setBorderPainted(false);
         btnGuardar.setFocusPainted(false);
+        btnGuardar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnGuardar.addActionListener(e -> guardar());
 
         JButton btnCancelar = new JButton("Cancelar");
+        btnCancelar.setFont(new Font("Segoe UI", Font.BOLD, 13));
+        btnCancelar.setBackground(new Color(100, 110, 130));
+        btnCancelar.setForeground(Color.WHITE);
+        btnCancelar.setOpaque(true);
+        btnCancelar.setBorderPainted(false);
         btnCancelar.setFocusPainted(false);
+        btnCancelar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnCancelar.addActionListener(e -> dispose());
 
         panelBotones.add(btnGuardar);
