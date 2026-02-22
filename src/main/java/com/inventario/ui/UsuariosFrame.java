@@ -63,7 +63,10 @@ public class UsuariosFrame extends JFrame {
         btn.setFont(new Font("Segoe UI", Font.BOLD, 12));
         btn.setBackground(color);
         btn.setForeground(Color.WHITE);
+        btn.setOpaque(true);
+        btn.setBorderPainted(false);
         btn.setFocusPainted(false);
+        btn.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         return btn;
     }
 

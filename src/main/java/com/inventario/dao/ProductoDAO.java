@@ -63,7 +63,7 @@ public class ProductoDAO {
     }
 
     public boolean actualizar(Producto p) {
-        String sql = "UPDATE productos SET codigo=?, nombre=?, descripcion=?, categoria=?, cantidad=?, precio=?, stock_minimo=? WHERE id=?";
+        String sql = "UPDATE productos SET codigo=?, nombre=?, descripcion=?, categoria=?, cantidad=?, precio=?, stock_minimo=?, fecha_actualizacion=CURRENT_TIMESTAMP WHERE id=?";
         try (PreparedStatement ps = getConn().prepareStatement(sql)) {
             ps.setString(1, p.getCodigo());
             ps.setString(2, p.getNombre());
@@ -126,7 +126,7 @@ public class ProductoDAO {
             JOIN productos p ON m.producto_id = p.id
             JOIN usuarios u ON m.usuario_id = u.id
             ORDER BY m.fecha DESC
-            LIMIT 200
+            LIMIT 500
         """;
         try (Statement stmt = getConn().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
@@ -143,6 +143,11 @@ public class ProductoDAO {
     }
 
     private Producto mapear(ResultSet rs) throws SQLException {
+        String fechaCreacion = null;
+        String fechaActualizacion = null;
+        try { fechaCreacion = rs.getString("fecha_creacion"); } catch (SQLException ignored) {}
+        try { fechaActualizacion = rs.getString("fecha_actualizacion"); } catch (SQLException ignored) {}
+
         return new Producto(
             rs.getInt("id"),
             rs.getString("codigo"),
@@ -151,7 +156,9 @@ public class ProductoDAO {
             rs.getString("categoria"),
             rs.getInt("cantidad"),
             rs.getDouble("precio"),
-            rs.getInt("stock_minimo")
+            rs.getInt("stock_minimo"),
+            fechaCreacion,
+            fechaActualizacion
         );
     }
 }

@@ -40,15 +40,24 @@ public class MovimientosFrame extends JFrame {
         tabla.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         tabla.setRowHeight(26);
         tabla.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 13));
+        tabla.getTableHeader().setBackground(new Color(210, 220, 240));
+        tabla.getTableHeader().setForeground(new Color(20, 30, 60));
         tabla.setDefaultRenderer(Object.class, new javax.swing.table.DefaultTableCellRenderer() {
             @Override
             public Component getTableCellRendererComponent(JTable t, Object v, boolean sel, boolean focus, int row, int col) {
                 Component c = super.getTableCellRendererComponent(t, v, sel, focus, row, col);
                 if (!sel) {
                     String tipo = (String) t.getValueAt(row, 3);
-                    if ("ENTRADA".equals(tipo)) c.setBackground(new Color(220, 255, 225));
-                    else if ("SALIDA".equals(tipo)) c.setBackground(new Color(255, 225, 220));
-                    else c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(245, 248, 255));
+                    switch (tipo) {
+                        case "ENTRADA"      -> { c.setBackground(new Color(220, 255, 225)); c.setForeground(new Color(0, 100, 0)); }
+                        case "SALIDA"       -> { c.setBackground(new Color(255, 225, 215)); c.setForeground(new Color(160, 50, 0)); }
+                        case "CREACION"     -> { c.setBackground(new Color(215, 230, 255)); c.setForeground(new Color(20, 60, 160)); }
+                        case "MODIFICACION" -> { c.setBackground(new Color(255, 245, 210)); c.setForeground(new Color(130, 90, 0)); }
+                        case "ELIMINACION"  -> { c.setBackground(new Color(255, 215, 215)); c.setForeground(new Color(150, 0, 0)); }
+                        default             -> { c.setBackground(row % 2 == 0 ? Color.WHITE : new Color(245, 248, 255)); c.setForeground(new Color(20, 30, 60)); }
+                    }
+                } else {
+                    c.setForeground(Color.WHITE);
                 }
                 return c;
             }
@@ -64,6 +73,13 @@ public class MovimientosFrame extends JFrame {
         panel.add(new JScrollPane(tabla), BorderLayout.CENTER);
 
         JButton btnCerrar = new JButton("Cerrar");
+        btnCerrar.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        btnCerrar.setBackground(new Color(100, 110, 130));
+        btnCerrar.setForeground(Color.WHITE);
+        btnCerrar.setOpaque(true);
+        btnCerrar.setBorderPainted(false);
+        btnCerrar.setFocusPainted(false);
+        btnCerrar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnCerrar.addActionListener(e -> dispose());
         JPanel panelBtn = new JPanel(new FlowLayout(FlowLayout.RIGHT));
         panelBtn.add(btnCerrar);

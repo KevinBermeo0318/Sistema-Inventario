@@ -57,7 +57,7 @@ public class LoginFrame extends JFrame {
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2;
         JLabel lblIniciar = new JLabel("Iniciar Sesion");
         lblIniciar.setFont(new Font("Segoe UI", Font.BOLD, 20));
-        lblIniciar.setForeground(new Color(15, 25, 45));
+        lblIniciar.setForeground(new Color(0, 0, 0));
         panelForm.add(lblIniciar, gbc);
 
         Font labelFont = new Font("Segoe UI", Font.BOLD, 13);
@@ -96,6 +96,8 @@ public class LoginFrame extends JFrame {
         btnIngresar.setFont(new Font("Segoe UI", Font.BOLD, 14));
         btnIngresar.setBackground(new Color(20, 30, 50));
         btnIngresar.setForeground(Color.WHITE);
+        btnIngresar.setOpaque(true);
+        btnIngresar.setBorderPainted(false);
         btnIngresar.setFocusPainted(false);
         btnIngresar.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnIngresar.setPreferredSize(new Dimension(200, 38));

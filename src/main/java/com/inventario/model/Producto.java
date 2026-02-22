@@ -9,6 +9,8 @@ public class Producto {
     private int cantidad;
     private double precio;
     private int stockMinimo;
+    private String fechaCreacion;
+    private String fechaActualizacion;
 
     public Producto() {}
 
@@ -22,6 +24,14 @@ public class Producto {
         this.cantidad = cantidad;
         this.precio = precio;
         this.stockMinimo = stockMinimo;
+    }
+
+    public Producto(int id, String codigo, String nombre, String descripcion,
+                    String categoria, int cantidad, double precio, int stockMinimo,
+                    String fechaCreacion, String fechaActualizacion) {
+        this(id, codigo, nombre, descripcion, categoria, cantidad, precio, stockMinimo);
+        this.fechaCreacion = fechaCreacion;
+        this.fechaActualizacion = fechaActualizacion;
     }
 
     public int getId() { return id; }
@@ -47,6 +57,12 @@ public class Producto {
 
     public int getStockMinimo() { return stockMinimo; }
     public void setStockMinimo(int stockMinimo) { this.stockMinimo = stockMinimo; }
+
+    public String getFechaCreacion() { return fechaCreacion; }
+    public void setFechaCreacion(String fechaCreacion) { this.fechaCreacion = fechaCreacion; }
+
+    public String getFechaActualizacion() { return fechaActualizacion; }
+    public void setFechaActualizacion(String fechaActualizacion) { this.fechaActualizacion = fechaActualizacion; }
 
     public boolean stockBajo() {
         return cantidad <= stockMinimo;
