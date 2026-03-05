@@ -1,260 +1,386 @@
-# 🗂️ Sistema de Inventario
+# Sistema de Inventario - Documentación del Código
 
-![Java](https://img.shields.io/badge/Java-17-blue)
-![Maven](https://img.shields.io/badge/Maven-Build-orange)
-![SQLite](https://img.shields.io/badge/Database-SQLite-lightgrey)
-![Status](https://img.shields.io/badge/Status-Completed-success)
+## Descripción General
 
-Sistema de Inventario desarrollado en **Java** utilizando arquitectura en capas (DAO + Model + UI) y base de datos **SQLite** para la persistencia de datos.
+Este proyecto es un **Sistema de Inventario desarrollado en Java** que
+permite gestionar productos, categorías y movimientos de inventario. El
+sistema está organizado usando **arquitectura por capas**, separando
+claramente:
 
-🔗 Repositorio:  
-https://github.com/KevinBermeo0318/Sistema-Inventario
+-   Modelos (entidades del sistema)
+-   DAO (acceso a datos)
+-   Configuración de base de datos
+-   Interfaz de usuario
 
----
+Esto permite que el sistema sea **más fácil de mantener, escalar y
+comprender**.
 
-# 📌 Descripción General
+------------------------------------------------------------------------
 
-La aplicación permite administrar productos y usuarios, así como registrar movimientos de inventario (entradas y salidas).
+# Arquitectura del Proyecto
 
-Está diseñada como una aplicación de escritorio utilizando **Java Swing**, aplicando buenas prácticas como:
+El proyecto sigue la siguiente estructura:
 
-- Separación de responsabilidades
-- Patrón DAO
-- Persistencia con SQLite
-- Organización modular del código
+    src
+    │
+    ├── dao
+    │   ├── ProductoDAO.java
+    │   ├── CategoriaDAO.java
+    │   └── MovimientoDAO.java
+    │
+    ├── models
+    │   ├── Producto.java
+    │   ├── Categoria.java
+    │   ├── Movimiento.java
+    │   └── AlertaStock.java
+    │
+    ├── database
+    │   └── DatabaseConfig.java
+    │
+    ├── ui
+    │   ├── MainWindow.java
+    │   ├── ProductosWindow.java
+    │   ├── CategoriasWindow.java
+    │   ├── MovimientosWindow.java
+    │   ├── AlertasWindow.java
+    │   └── ReportesWindow.java
+    │
+    └── Main.java
 
----
+Cada carpeta tiene una responsabilidad específica.
 
-# 🧠 Flujo del Sistema
+------------------------------------------------------------------------
 
-1. El usuario inicia sesión.
-2. Se valida contra la base de datos.
-3. Se accede al panel principal.
-4. Desde el menú principal se puede:
-   - Gestionar productos
-   - Gestionar usuarios
-   - Registrar movimientos
-5. Cada acción se comunica con la base de datos a través de los DAO.
+# 1. Main.java
 
----
+Esta clase es el **punto de entrada del sistema**.
 
-# 🏗️ Arquitectura del Proyecto
+## Función principal
 
-```
-com.inventario
-│
-├── dao        → Lógica de acceso a datos
-├── db         → Conexión a SQLite
-├── model      → Clases que representan entidades
-├── ui         → Interfaz gráfica
-└── Main.java  → Punto de entrada
-```
+    public static void main(String[] args)
 
----
+Responsabilidades:
 
-# 📂 Detalle del Código por Módulo
+-   Iniciar la aplicación.
+-   Crear las instancias de los DAO.
+-   Inicializar el sistema.
+-   Mostrar el menú o interfaz principal.
 
----
+También gestiona el **flujo principal del programa**.
 
-## 🔹 1. model (Entidades del sistema)
+### Flujo del sistema
 
-Contiene las clases que representan las tablas de la base de datos.
+1.  Se inicia el programa.
+2.  Se cargan las conexiones a la base de datos.
+3.  Se abre la ventana principal.
+4.  El usuario interactúa con el sistema.
+5.  Las acciones se procesan mediante los DAO.
 
-### 📦 Producto.java
-Representa un producto del inventario.
+------------------------------------------------------------------------
 
-Atributos principales:
-- id
-- nombre
-- descripcion
-- cantidad
-- precio
+# 2. Configuración de la Base de Datos
 
-Responsabilidad:
-- Actuar como contenedor de datos.
-- Ser utilizado por DAO y UI para manipular información.
+## DatabaseConfig.java
 
----
+Esta clase es responsable de **gestionar la conexión con la base de
+datos MySQL**.
 
-### 👤 Usuario.java
-Representa un usuario del sistema.
+### Variables principales
 
-Atributos:
-- id
-- username
-- password
-- rol (si está implementado)
+    private static final String URL = "jdbc:mysql://localhost:3306/inventario_db";
+    private static final String USER = "root";
+    private static final String PASSWORD = "";
 
-Responsabilidad:
-- Gestionar autenticación.
-- Representar los usuarios almacenados en la base de datos.
+Explicación:
 
----
+-   **URL**: dirección del servidor de base de datos.
+-   **inventario_db**: nombre de la base de datos.
+-   **USER**: usuario de MySQL.
+-   **PASSWORD**: contraseña.
 
-## 🔹 2. dao (Data Access Object)
+### Método principal
 
-Encargado de interactuar con la base de datos.
+    public static Connection getConnection()
 
-Aquí se encuentra la lógica SQL del sistema.
+Este método:
 
----
+1.  Crea una conexión con MySQL.
+2.  Retorna un objeto `Connection`.
+3.  Permite que los DAO ejecuten consultas SQL.
 
-### 📦 ProductoDAO.java
+------------------------------------------------------------------------
 
-Funciones principales:
+# 3. Modelos del Sistema
 
-- insertarProducto()
-- actualizarProducto()
-- eliminarProducto()
-- obtenerProductos()
+Los modelos representan **las entidades del sistema**.
 
-Responsabilidad:
-- Ejecutar consultas SQL.
-- Convertir resultados en objetos Producto.
-- Separar la lógica de base de datos del resto del sistema.
+Se encuentran en la carpeta:
 
----
+    src/models
 
-### 👤 UsuarioDAO.java
+------------------------------------------------------------------------
 
-Funciones principales:
+## Producto.java
 
-- insertarUsuario()
-- validarUsuario()
-- obtenerUsuarios()
-- eliminarUsuario()
+Representa un producto dentro del inventario.
 
-Responsabilidad:
-- Gestionar autenticación.
-- Controlar la persistencia de usuarios.
+### Atributos
 
----
+-   id
+-   nombre
+-   precio
+-   stock
+-   categoria
 
-## 🔹 3. db (Conexión a base de datos)
+### Responsabilidad
 
-### 🗄️ DatabaseManager.java
+-   Almacenar información de productos.
+-   Transportar datos entre DAO y UI.
 
-Responsabilidad:
-- Crear la conexión con SQLite.
-- Inicializar la base de datos si no existe.
-- Centralizar la configuración de conexión.
+------------------------------------------------------------------------
 
-Se utiliza JDBC para conectar con:
+## Categoria.java
 
-```
-inventario.db
-```
+Representa una categoría de productos.
 
----
+### Atributos
 
-## 🔹 4. ui (Interfaz Gráfica)
+-   id
+-   nombre
+-   descripcion
 
-Desarrollada con Java Swing.
+### Función
 
----
+Permite organizar los productos por tipo.
 
-### 🔐 LoginFrame.java
+Ejemplo:
 
-Función:
-- Mostrar formulario de inicio de sesión.
-- Validar credenciales usando UsuarioDAO.
-- Redirigir al panel principal si son correctas.
+  id   nombre
+  ---- -------------
+  1    Electrónica
+  2    Ropa
+  3    Alimentos
 
----
+------------------------------------------------------------------------
 
-### 🖥️ MainFrame.java
+## Movimiento.java
 
-Función:
-- Ventana principal del sistema.
-- Permite navegar hacia:
-  - Gestión de productos
-  - Gestión de usuarios
-  - Movimientos
+Representa un movimiento del inventario.
 
----
+### Atributos
 
-### 📦 UsuariosFrame.java
+-   producto
+-   cantidad
+-   tipoMovimiento
+-   fecha
+-   usuario
 
-Permite:
-- Ver lista de usuarios.
-- Agregar nuevos usuarios.
-- Eliminar usuarios.
+### TipoMovimiento (Enum)
 
----
+Define el tipo de movimiento:
 
-### 📦 MovimientosFrame.java
+-   ENTRADA → aumenta el stock
+-   SALIDA → reduce el stock
 
-Permite:
-- Registrar entradas de inventario.
-- Registrar salidas.
-- Actualizar automáticamente la cantidad disponible.
+Esto permite llevar **control del inventario**.
 
----
+------------------------------------------------------------------------
 
-### 📦 ProductoDialog.java / UsuarioDialog.java
+## AlertaStock.java
 
-Ventanas emergentes para:
-- Crear
-- Editar
-- Confirmar información
+Se utiliza para detectar problemas de inventario.
 
----
+Tipos de alerta:
 
-# 🗄️ Base de Datos
+-   STOCK_BAJO
+-   STOCK_CRITICO
 
-Base de datos local SQLite:
+Esto permite generar advertencias cuando un producto está por agotarse.
 
-```
-inventario.db
-```
+------------------------------------------------------------------------
 
-Tablas principales:
+# 4. DAO (Data Access Object)
 
-- usuarios
-- productos
-- movimientos (si está implementado)
+Los DAO se encargan de **toda la interacción con la base de datos**.
 
-La base de datos se crea automáticamente al ejecutar el sistema.
+Se encuentran en:
 
----
+    src/dao
 
-# 🛠️ Tecnologías Utilizadas
+------------------------------------------------------------------------
 
-- Java 17
-- Maven
-- Java Swing
-- SQLite
-- JDBC
-- Patrón DAO
+# ProductoDAO.java
 
----
+Gestiona todas las operaciones relacionadas con los productos.
 
-# 📈 Posibles Mejoras
+### obtenerProductos()
 
-- Implementar encriptación de contraseñas
-- Implementar roles y permisos
-- Añadir reportes en PDF
-- Migrar a versión web (Spring Boot)
-- Implementar pruebas unitarias (JUnit)
+Consulta todos los productos de la base de datos.
 
----
+SQL utilizado:
 
-# 🎯 Objetivo Académico
+    SELECT * FROM productos
 
-Este proyecto demuestra conocimientos en:
+------------------------------------------------------------------------
 
-- Programación Orientada a Objetos
-- Arquitectura en capas
-- Gestión de bases de datos
-- Desarrollo de aplicaciones de escritorio
-- Organización profesional de proyectos
+### insertarProducto()
 
----
+Agrega un nuevo producto.
 
-# 👨‍💻 Autor
+SQL típico:
 
-Kevin Rico Bermeo  
-Desarrollador en formación  
+    INSERT INTO productos (nombre, precio, stock, categoria_id)
+    VALUES (?, ?, ?, ?)
 
-GitHub:  
-https://github.com/KevinBermeo0318
+------------------------------------------------------------------------
+
+### actualizarProducto()
+
+Modifica la información de un producto existente.
+
+Se utiliza para:
+
+-   cambiar precio
+-   actualizar stock
+-   modificar nombre
+
+------------------------------------------------------------------------
+
+### eliminarProducto()
+
+Elimina un producto de la base de datos.
+
+------------------------------------------------------------------------
+
+# CategoriaDAO.java
+
+Gestiona las categorías.
+
+Funciones:
+
+-   obtenerCategorias()
+-   insertarCategoria()
+-   eliminarCategoria()
+
+Permite mantener organizada la clasificación de productos.
+
+------------------------------------------------------------------------
+
+# MovimientoDAO.java
+
+Gestiona los movimientos del inventario.
+
+------------------------------------------------------------------------
+
+### registrarMovimiento()
+
+Registra una entrada o salida de inventario.
+
+Ejemplo:
+
+-   ENTRADA → cuando llegan productos.
+-   SALIDA → cuando se venden productos.
+
+------------------------------------------------------------------------
+
+### obtenerMovimientos()
+
+Devuelve el historial completo de movimientos.
+
+Esto permite realizar auditorías y reportes.
+
+------------------------------------------------------------------------
+
+# 5. Base de Datos
+
+El sistema utiliza **MySQL**.
+
+La estructura se encuentra en:
+
+    sql/base.sql
+
+------------------------------------------------------------------------
+
+## Tabla productos
+
+Almacena todos los productos.
+
+Campos típicos:
+
+-   id_producto
+-   nombre
+-   precio
+-   stock
+-   categoria_id
+
+------------------------------------------------------------------------
+
+## Tabla categorias
+
+Almacena las categorías de productos.
+
+Campos:
+
+-   id_categoria
+-   nombre
+-   descripcion
+
+------------------------------------------------------------------------
+
+## Tabla movimientos
+
+Registra todas las operaciones del inventario.
+
+Campos:
+
+-   id_movimiento
+-   producto_id
+-   tipo_movimiento
+-   cantidad
+-   fecha
+-   usuario
+
+------------------------------------------------------------------------
+
+# Flujo Completo del Sistema
+
+    Usuario
+       │
+       ▼
+    Interfaz gráfica (UI)
+       │
+       ▼
+    DAO
+       │
+       ▼
+    DatabaseConfig
+       │
+       ▼
+    MySQL Database
+
+Esto significa:
+
+1.  El usuario realiza una acción en la interfaz.
+2.  La interfaz llama a un DAO.
+3.  El DAO ejecuta una consulta SQL.
+4.  La base de datos devuelve el resultado.
+
+------------------------------------------------------------------------
+
+# Conceptos de Programación Aplicados
+
+Este proyecto implementa:
+
+-   Programación Orientada a Objetos
+-   Arquitectura por capas
+-   Patrón DAO
+-   JDBC
+-   Modelado de base de datos
+-   Separación de responsabilidades
+
+------------------------------------------------------------------------
+
+# Autor
+
+Kevin Rico Bermeo
+
