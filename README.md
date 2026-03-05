@@ -1,386 +1,226 @@
-# Sistema de Inventario - Documentación del Código
+# 📊 Diagramas del Sistema
 
-## Descripción General
+Para facilitar la comprensión del proyecto, a continuación se muestran algunos diagramas que explican la arquitectura, base de datos y funcionamiento del sistema.
 
-Este proyecto es un **Sistema de Inventario desarrollado en Java** que
-permite gestionar productos, categorías y movimientos de inventario. El
-sistema está organizado usando **arquitectura por capas**, separando
-claramente:
+---
 
--   Modelos (entidades del sistema)
--   DAO (acceso a datos)
--   Configuración de base de datos
--   Interfaz de usuario
+# 🏗️ Arquitectura del Sistema
 
-Esto permite que el sistema sea **más fácil de mantener, escalar y
-comprender**.
+Este diagrama muestra cómo interactúan las diferentes capas del proyecto.
 
-------------------------------------------------------------------------
+```mermaid
+flowchart TD
 
-# Arquitectura del Proyecto
+A[👤 Usuario] --> B[🖥️ Interfaz UI]
 
-El proyecto sigue la siguiente estructura:
+B --> C[📦 DAO Layer]
 
-    src
-    │
-    ├── dao
-    │   ├── ProductoDAO.java
-    │   ├── CategoriaDAO.java
-    │   └── MovimientoDAO.java
-    │
-    ├── models
-    │   ├── Producto.java
-    │   ├── Categoria.java
-    │   ├── Movimiento.java
-    │   └── AlertaStock.java
-    │
-    ├── database
-    │   └── DatabaseConfig.java
-    │
-    ├── ui
-    │   ├── MainWindow.java
-    │   ├── ProductosWindow.java
-    │   ├── CategoriasWindow.java
-    │   ├── MovimientosWindow.java
-    │   ├── AlertasWindow.java
-    │   └── ReportesWindow.java
-    │
-    └── Main.java
+C --> D[⚙️ DatabaseConfig]
 
-Cada carpeta tiene una responsabilidad específica.
+D --> E[(🗄️ MySQL Database)]
 
-------------------------------------------------------------------------
+subgraph UI
+B
+end
 
-# 1. Main.java
+subgraph Lógica de Negocio
+C
+end
 
-Esta clase es el **punto de entrada del sistema**.
+subgraph Persistencia
+D
+E
+end
+```
 
-## Función principal
+### Explicación
 
-    public static void main(String[] args)
+👤 **Usuario**
+Interactúa con el sistema mediante la interfaz.
 
-Responsabilidades:
+🖥️ **UI (Interfaz)**
+Ventanas del sistema donde el usuario realiza acciones.
 
--   Iniciar la aplicación.
--   Crear las instancias de los DAO.
--   Inicializar el sistema.
--   Mostrar el menú o interfaz principal.
+📦 **DAO**
+Contiene la lógica que ejecuta consultas SQL.
 
-También gestiona el **flujo principal del programa**.
+⚙️ **DatabaseConfig**
+Administra la conexión con la base de datos.
 
-### Flujo del sistema
+🗄️ **MySQL**
+Almacena todos los datos del sistema.
 
-1.  Se inicia el programa.
-2.  Se cargan las conexiones a la base de datos.
-3.  Se abre la ventana principal.
-4.  El usuario interactúa con el sistema.
-5.  Las acciones se procesan mediante los DAO.
+---
 
-------------------------------------------------------------------------
+# 🗄️ Diagrama de Base de Datos
 
-# 2. Configuración de la Base de Datos
+Este diagrama representa la estructura principal de la base de datos del sistema.
 
-## DatabaseConfig.java
+```mermaid
+erDiagram
 
-Esta clase es responsable de **gestionar la conexión con la base de
-datos MySQL**.
+CATEGORIAS {
+int id_categoria
+string nombre
+string descripcion
+}
 
-### Variables principales
+PRODUCTOS {
+int id_producto
+string nombre
+double precio
+int stock
+int categoria_id
+}
 
-    private static final String URL = "jdbc:mysql://localhost:3306/inventario_db";
-    private static final String USER = "root";
-    private static final String PASSWORD = "";
+MOVIMIENTOS {
+int id_movimiento
+int producto_id
+string tipo_movimiento
+int cantidad
+date fecha
+string usuario
+}
 
-Explicación:
+CATEGORIAS ||--o{ PRODUCTOS : clasifica
+PRODUCTOS ||--o{ MOVIMIENTOS : genera
+```
 
--   **URL**: dirección del servidor de base de datos.
--   **inventario_db**: nombre de la base de datos.
--   **USER**: usuario de MySQL.
--   **PASSWORD**: contraseña.
+### Explicación
 
-### Método principal
+📂 **Categorías**
+Permiten organizar los productos.
 
-    public static Connection getConnection()
+📦 **Productos**
+Contienen la información del inventario.
 
-Este método:
+🔄 **Movimientos**
+Registran entradas y salidas de productos.
 
-1.  Crea una conexión con MySQL.
-2.  Retorna un objeto `Connection`.
-3.  Permite que los DAO ejecuten consultas SQL.
+Relaciones:
 
-------------------------------------------------------------------------
+* Una **categoría** puede tener muchos productos.
+* Un **producto** puede tener muchos movimientos.
+
+---
+
+# 🧩 Diagrama de Clases
 
-# 3. Modelos del Sistema
+Este diagrama muestra la estructura de las clases principales del sistema.
 
-Los modelos representan **las entidades del sistema**.
+```mermaid
+classDiagram
 
-Se encuentran en la carpeta:
+class Producto {
++int id
++String nombre
++double precio
++int stock
++int categoria
+}
 
-    src/models
+class Categoria {
++int id
++String nombre
++String descripcion
+}
 
-------------------------------------------------------------------------
+class Movimiento {
++int id
++Producto producto
++int cantidad
++TipoMovimiento tipo
++Date fecha
++String usuario
+}
 
-## Producto.java
+class ProductoDAO {
++obtenerProductos()
++insertarProducto()
++actualizarProducto()
++eliminarProducto()
+}
 
-Representa un producto dentro del inventario.
+class CategoriaDAO {
++obtenerCategorias()
++insertarCategoria()
++eliminarCategoria()
+}
 
-### Atributos
+class MovimientoDAO {
++registrarMovimiento()
++obtenerMovimientos()
+}
 
--   id
--   nombre
--   precio
--   stock
--   categoria
+ProductoDAO --> Producto
+CategoriaDAO --> Categoria
+MovimientoDAO --> Movimiento
+Movimiento --> Producto
+Producto --> Categoria
+```
 
-### Responsabilidad
+### Explicación
 
--   Almacenar información de productos.
--   Transportar datos entre DAO y UI.
+📦 **Producto**
+Representa un artículo del inventario.
 
-------------------------------------------------------------------------
+📂 **Categoria**
+Clasifica los productos.
 
-## Categoria.java
+🔄 **Movimiento**
+Registra entradas y salidas de inventario.
 
-Representa una categoría de productos.
+📦 **DAO**
+Manejan la comunicación con la base de datos.
 
-### Atributos
+---
 
--   id
--   nombre
--   descripcion
+# 🔄 Flujo de Funcionamiento del Sistema
 
-### Función
+Este diagrama explica cómo se procesa una acción dentro del sistema.
 
-Permite organizar los productos por tipo.
+```mermaid
+sequenceDiagram
 
-Ejemplo:
+actor Usuario
+participant UI
+participant DAO
+participant DB
 
-  id   nombre
-  ---- -------------
-  1    Electrónica
-  2    Ropa
-  3    Alimentos
+Usuario->>UI: Realiza una acción
+UI->>DAO: Solicita operación
+DAO->>DB: Ejecuta consulta SQL
+DB-->>DAO: Devuelve datos
+DAO-->>UI: Resultado
+UI-->>Usuario: Muestra información
+```
 
-------------------------------------------------------------------------
+### Ejemplo de flujo
 
-## Movimiento.java
+1️⃣ El usuario registra un producto
+2️⃣ La interfaz envía la solicitud al **ProductoDAO**
+3️⃣ El DAO ejecuta un **INSERT en la base de datos**
+4️⃣ MySQL guarda el producto
+5️⃣ La interfaz muestra el resultado
 
-Representa un movimiento del inventario.
+---
 
-### Atributos
+# 🚀 Beneficios de esta Arquitectura
 
--   producto
--   cantidad
--   tipoMovimiento
--   fecha
--   usuario
+Este sistema utiliza buenas prácticas de desarrollo:
 
-### TipoMovimiento (Enum)
+✔️ Separación de responsabilidades
+✔️ Arquitectura por capas
+✔️ Código modular
+✔️ Fácil mantenimiento
+✔️ Escalabilidad
 
-Define el tipo de movimiento:
+---
 
--   ENTRADA → aumenta el stock
--   SALIDA → reduce el stock
+# 📌 Autor
 
-Esto permite llevar **control del inventario**.
+👨‍💻 **Kevin Rico Bermeo**
+Desarrollador en formación
 
-------------------------------------------------------------------------
-
-## AlertaStock.java
-
-Se utiliza para detectar problemas de inventario.
-
-Tipos de alerta:
-
--   STOCK_BAJO
--   STOCK_CRITICO
-
-Esto permite generar advertencias cuando un producto está por agotarse.
-
-------------------------------------------------------------------------
-
-# 4. DAO (Data Access Object)
-
-Los DAO se encargan de **toda la interacción con la base de datos**.
-
-Se encuentran en:
-
-    src/dao
-
-------------------------------------------------------------------------
-
-# ProductoDAO.java
-
-Gestiona todas las operaciones relacionadas con los productos.
-
-### obtenerProductos()
-
-Consulta todos los productos de la base de datos.
-
-SQL utilizado:
-
-    SELECT * FROM productos
-
-------------------------------------------------------------------------
-
-### insertarProducto()
-
-Agrega un nuevo producto.
-
-SQL típico:
-
-    INSERT INTO productos (nombre, precio, stock, categoria_id)
-    VALUES (?, ?, ?, ?)
-
-------------------------------------------------------------------------
-
-### actualizarProducto()
-
-Modifica la información de un producto existente.
-
-Se utiliza para:
-
--   cambiar precio
--   actualizar stock
--   modificar nombre
-
-------------------------------------------------------------------------
-
-### eliminarProducto()
-
-Elimina un producto de la base de datos.
-
-------------------------------------------------------------------------
-
-# CategoriaDAO.java
-
-Gestiona las categorías.
-
-Funciones:
-
--   obtenerCategorias()
--   insertarCategoria()
--   eliminarCategoria()
-
-Permite mantener organizada la clasificación de productos.
-
-------------------------------------------------------------------------
-
-# MovimientoDAO.java
-
-Gestiona los movimientos del inventario.
-
-------------------------------------------------------------------------
-
-### registrarMovimiento()
-
-Registra una entrada o salida de inventario.
-
-Ejemplo:
-
--   ENTRADA → cuando llegan productos.
--   SALIDA → cuando se venden productos.
-
-------------------------------------------------------------------------
-
-### obtenerMovimientos()
-
-Devuelve el historial completo de movimientos.
-
-Esto permite realizar auditorías y reportes.
-
-------------------------------------------------------------------------
-
-# 5. Base de Datos
-
-El sistema utiliza **MySQL**.
-
-La estructura se encuentra en:
-
-    sql/base.sql
-
-------------------------------------------------------------------------
-
-## Tabla productos
-
-Almacena todos los productos.
-
-Campos típicos:
-
--   id_producto
--   nombre
--   precio
--   stock
--   categoria_id
-
-------------------------------------------------------------------------
-
-## Tabla categorias
-
-Almacena las categorías de productos.
-
-Campos:
-
--   id_categoria
--   nombre
--   descripcion
-
-------------------------------------------------------------------------
-
-## Tabla movimientos
-
-Registra todas las operaciones del inventario.
-
-Campos:
-
--   id_movimiento
--   producto_id
--   tipo_movimiento
--   cantidad
--   fecha
--   usuario
-
-------------------------------------------------------------------------
-
-# Flujo Completo del Sistema
-
-    Usuario
-       │
-       ▼
-    Interfaz gráfica (UI)
-       │
-       ▼
-    DAO
-       │
-       ▼
-    DatabaseConfig
-       │
-       ▼
-    MySQL Database
-
-Esto significa:
-
-1.  El usuario realiza una acción en la interfaz.
-2.  La interfaz llama a un DAO.
-3.  El DAO ejecuta una consulta SQL.
-4.  La base de datos devuelve el resultado.
-
-------------------------------------------------------------------------
-
-# Conceptos de Programación Aplicados
-
-Este proyecto implementa:
-
--   Programación Orientada a Objetos
--   Arquitectura por capas
--   Patrón DAO
--   JDBC
--   Modelado de base de datos
--   Separación de responsabilidades
-
-------------------------------------------------------------------------
-
-# Autor
-
-Kevin Rico Bermeo
-
+🔗 GitHub
+https://github.com/KevinBermeo0318
